@@ -1,0 +1,15 @@
+#carouselDiv{
+    width: 400px;
+    margin-left: 12%;
+    margin-top: 15px;
+}
+.Carousel{
+    background-color: #000000;
+    width: 360px;
+    height: 400px;
+    margin: auto;
+}
+.Carousel .color{
+    background-color: #000000;
+    color: white;
+}
