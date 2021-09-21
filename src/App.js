@@ -5,11 +5,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
 } from "react-router-dom";
-import axios from 'axios';
-import { Carousel } from 'react-bootstrap';
+import {
+  Carousel, Row,
+  Col,
+  FloatingLabel,
+  Form,
+  Button
+} 
+from 'react-bootstrap';
 import './style.css';
+import Books from './components/Books';
+import axios from 'axios';
 class App extends React.Component {
 
   constructor(props) {
@@ -17,6 +25,12 @@ class App extends React.Component {
     this.state = {
       user: null,
       data: [],
+      title: '',
+      status: '',
+      description: '',
+      email: '',
+      showForm: false,
+      id:''
     }
   }
 
@@ -33,12 +47,69 @@ class App extends React.Component {
   }
 
   componentDidMount = () => {
-    axios.get(`http://localhost:3001/books?id=6147d0aa35848e229a80d636`).then(response => {
+    axios.get(`https://can-of-books-backend-moegts.herokuapp.com/books`).then(response => {
       this.setState({
-        data: response.data.books
+        data: response.data
       })
     })
   }
+
+  titleSelect = (e) => {
+    let title = e.target.value
+    this.setState({
+      title: title,
+    })
+  }
+
+  descriptionSelect = (e) => {
+    let description = e.target.value
+    this.setState({
+      description: description,
+    })
+  }
+
+  StatusSelect = (e) => {
+    let StatusSelect = e.target.value
+    this.setState({
+      status: StatusSelect,
+    })
+  }
+
+  emailSelect = (e) => {
+    let email = e.target.value
+    this.setState({
+      email: email,
+    })
+  }
+
+  handleDelete = (id) => {
+    axios.delete(`https://can-of-books-backend-moegts.herokuapp.com/delete-book/${id}`).then(response => {
+      console.log(response.data);
+      this.setState({
+        data: response.data
+      })
+    })
+  }
+  handleUpdate = () => {
+    let data = {
+      title:this.state.title,
+      status:this.state.status,
+      description:this.state.description,
+      email:this.state.email
+    }
+    axios.put(`https://can-of-books-backend-moegts.herokuapp.com/update-book/${this.state.id}`,data).then(response => {
+      this.setState({
+        data: response.data
+      })
+    })
+  }
+  updateForm = (id) =>{
+    this.setState({
+      id:id,
+      showForm:true,
+    })
+  }
+  
 
   render() {
     return (
@@ -52,28 +123,55 @@ class App extends React.Component {
             {/* TODO: add a route with a path of '/profile' that renders a `Profile` component */}
           </Switch>
           {this.state.data.length > 0 && <Carousel indicators={false} className="Carousel" >
-                {
-                    this.state.data.map((Element, i) => {
-                        return <Carousel.Item>
-                            <img
-                                className="d-block w-100"
-                                src="https://colorcasters.com/wp-content/uploads/2014/05/Black-300x300.jpeg"
-                                alt="First slide"
-                            />
-                            <Carousel.Caption className="color">
-                                <h3 className="ele">Book Title: {Element.title}</h3>
-                                <p className="ele">Description: {Element.description}</p>
-                                <p className="ele">Status: Active{Element.status}</p>
-                                <p className="ele">E-mail: moegts@gmail.com{Element.email}</p>
-                            </Carousel.Caption>
-                        </Carousel.Item>
-                    })}
-
-            </Carousel>
-            }
             {
-                this.state.data.length ===0 && <h3>The book collection is empty.</h3>
-            }
+              this.state.data.map((Element, i) => {
+                return <Carousel.Item>
+                  <img
+                    className="d-block w-100"
+                    src="https://colorcasters.com/wp-content/uploads/2014/05/Black-300x300.jpeg"
+                    alt="First slide"
+                  />
+                  <Carousel.Caption className="color">
+                    <h3 className="ele">Book Title: {Element.title}</h3>
+                    <p className="ele">Description: {Element.description}</p>
+                    <p className="ele">Status: {Element.status}</p>
+                    <p className="ele">E-mail: {Element.email}</p>
+                    <button onClick={() => this.handleDelete(Element._id)}>Delete Book</button>
+                    <button onClick={() => this.updateForm(Element._id)}>Update Book</button>
+                  </Carousel.Caption>
+                </Carousel.Item>
+              })}
+
+          </Carousel>
+          }
+          {
+            <Row className="g-2">
+              <Col md>
+                <FloatingLabel controlId="floatingInputGrid" label="Title">
+                  <Form.Control type="text" onChange={this.titleSelect} />
+                </FloatingLabel>
+                <FloatingLabel controlId="floatingInputGrid" label="Description">
+                  <Form.Control type="text" onChange={this.descriptionSelect}/>
+                </FloatingLabel>
+                <FloatingLabel controlId="floatingInputGrid" label="Status">
+                  <Form.Control type="text" onChange={this.StatusSelect} />
+                </FloatingLabel>
+                <FloatingLabel controlId="floatingInputGrid" label="E-mail">
+                  <Form.Control type="text" onChange={this.emailSelect} />
+                </FloatingLabel>
+                <Col>
+                  <Button type="submit">Create!</Button>
+                  <hr />
+                  <Button onClick={()=>this.handleUpdate()}>Update!</Button>
+                </Col>
+
+              </Col>
+
+            </Row>
+          }
+          {
+            this.state.data.length === 0 && <h3>The book collection is empty.</h3>
+          }
           <Footer />
         </Router>
       </>
