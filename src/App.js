@@ -16,7 +16,7 @@ import {
 } 
 from 'react-bootstrap';
 import './style.css';
-import Books from './components/Books';
+// import Books from './components/Books';
 import axios from 'axios';
 class App extends React.Component {
 
@@ -90,6 +90,7 @@ class App extends React.Component {
       })
     })
   }
+
   handleUpdate = () => {
     let data = {
       title:this.state.title,
@@ -97,12 +98,17 @@ class App extends React.Component {
       description:this.state.description,
       email:this.state.email
     }
-    axios.put(`https://can-of-books-backend-moegts.herokuapp.com/update-book/${this.state.id}`,data).then(response => {
+    axios.patch(`https://can-of-books-backend-moegts.herokuapp.com/update-book/${this.state.id}`,data).then(response => {
       this.setState({
         data: response.data
       })
-    })
+    }).then(this.refreshPage);
   }
+
+  refreshPage = () => {
+    window.location.reload();
+  }
+  
   updateForm = (id) =>{
     this.setState({
       id:id,
@@ -110,6 +116,20 @@ class App extends React.Component {
     })
   }
   
+  createBook =(e)=>{
+    e.preventDefault();
+    let data = {
+      title:this.state.title,
+      status:this.state.status,
+      description:this.state.description,
+      email:this.state.email
+    }
+    axios.post(`https://can-of-books-backend-moegts.herokuapp.com/create-book`,data).then(response => {
+      this.setState({
+        data: response.data
+      })
+    })
+  }
 
   render() {
     return (
@@ -125,13 +145,13 @@ class App extends React.Component {
           {this.state.data.length > 0 && <Carousel indicators={false} className="Carousel" >
             {
               this.state.data.map((Element, i) => {
-                return <Carousel.Item>
+                return <Carousel.Item key={ Math.random().toString(36).substr(2, 9) }>
                   <img
                     className="d-block w-100"
                     src="https://colorcasters.com/wp-content/uploads/2014/05/Black-300x300.jpeg"
                     alt="First slide"
                   />
-                  <Carousel.Caption className="color">
+                  <Carousel.Caption  className="color">
                     <h3 className="ele">Book Title: {Element.title}</h3>
                     <p className="ele">Description: {Element.description}</p>
                     <p className="ele">Status: {Element.status}</p>
@@ -160,7 +180,7 @@ class App extends React.Component {
                   <Form.Control type="text" onChange={this.emailSelect} />
                 </FloatingLabel>
                 <Col>
-                  <Button type="submit">Create!</Button>
+                  <Button onClick={this.createBook} type="submit">Create!</Button>
                   <hr />
                   <Button onClick={()=>this.handleUpdate()}>Update!</Button>
                 </Col>
