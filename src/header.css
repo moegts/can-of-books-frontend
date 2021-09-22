@@ -5,3 +5,20 @@ a{
 a:hover{
   color:darkgrey;
 }
+
+.profile-hover {
+  position: absolute !important;
+  right: 125px !important;
+}
+
+
+.button-placement {
+  position: absolute !important;
+  right: 30px !important;
+}
+
+.button-placement-button{
+  position: absolute !important;
+  right: 150px !important;
+  top: 17px;
+}
